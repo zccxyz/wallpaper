@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:us/tool/request.dart';
 import 'package:us/tool/tool.dart';
@@ -34,37 +35,44 @@ class _ClassifyState extends State<Classify> {
     if (list.length == 0) {
       getData();
     }
-    return SafeArea(
-      child: Material(
-        color: defColor,
-        child: ListView.builder(
-          itemBuilder: (_, i) => item(i),
-          itemCount: list.length,
-          padding: EdgeInsets.all(15),
+    return Container(
+      color: defColor,
+      child: SafeArea(
+        child: Material(
+          color: defColor,
+          child: ListView.builder(
+            itemBuilder: (_, i) => item(i),
+            itemCount: list.length,
+            padding: EdgeInsets.all(8),
+            itemExtent: 120,
+          ),
         ),
       ),
     );
   }
 
   Widget item(int i) {
-    return Container(
-      height: 100,
-      decoration: BoxDecoration(
-        color: defColor2,
-      ),
-      margin: EdgeInsets.only(bottom: 15),
-      child: Stack(
-        children: <Widget>[
-          CachedNetworkImage(
-            height: 100,
-            width: getSize(context).width-30,
-            imageUrl: imgUrl + list[i]['url'],
-            fit: BoxFit.cover,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15),
+      child: ClipRRect(
+        child: Container(
+          height: 120,
+          color: defColor2,
+          child: Stack(
+            children: <Widget>[
+              CachedNetworkImage(
+                height: 120,
+                width: getSize(context).width-16,
+                imageUrl: imgUrl + list[i]['url'],
+                fit: BoxFit.cover,
+              ),
+              Center(
+                child: Text(list[i]['chName'], style: TextStyle(fontSize: 18, color: Colors.white),),
+              ),
+            ],
           ),
-          Center(
-            child: Text(list[i]['chName'], style: TextStyle(fontSize: 18, color: Colors.white),),
-          ),
-        ],
+        ),
+        borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
     );
   }

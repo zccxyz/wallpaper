@@ -95,7 +95,7 @@ class _WallpaperState extends State<Wallpaper> with TickerProviderStateMixin {
                 backgroundColor: defColor,
                 bottom: PreferredSize(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 15, right: 15),
+                      padding: const EdgeInsets.only(left: 8, right: 8),
                       child: TabBar(
                         indicatorColor: lightColor,
                         unselectedLabelColor: defColor2,
@@ -130,7 +130,7 @@ class _WallpaperState extends State<Wallpaper> with TickerProviderStateMixin {
       child: ListView.builder(
         itemBuilder: (_, i) => item(i),
         itemCount: data.length,
-        padding: EdgeInsets.all(15),
+        padding: EdgeInsets.all(8),
         itemExtent: 300,
       ),
     );
@@ -145,7 +145,7 @@ class _WallpaperState extends State<Wallpaper> with TickerProviderStateMixin {
             height: 50,
             child: Text(
               data[i]['Headline'],
-              style: TextStyle(color: lightColor),
+              style: TextStyle(color: lightColor, fontSize: 18, fontWeight: FontWeight.bold),
             ),
             alignment: Alignment.centerLeft,
           ),
@@ -156,7 +156,7 @@ class _WallpaperState extends State<Wallpaper> with TickerProviderStateMixin {
                 onTap: () {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(
+                      MaterialPageRoute(fullscreenDialog: true,
                           builder: (_) => Look(data[i]['List'][x]['Url'])));
                 },
                 child: Padding(
@@ -177,16 +177,23 @@ class _WallpaperState extends State<Wallpaper> with TickerProviderStateMixin {
   }
 
   Widget cacheImg(i, x) {
-    return CachedNetworkImage(
-      imageUrl: data[i]['List'][x]['Url'],
-      placeholder: (context, url) => SpinKitDoubleBounce(
-          color: Colors.white,
-          size: 20.0,
-          controller: AnimationController(
-              vsync: this, duration: const Duration(milliseconds: 1200))),
-      width: 130,
-      height: 250,
-      fit: BoxFit.cover,
+    return ClipRRect(
+      child: CachedNetworkImage(
+        imageUrl: data[i]['List'][x]['Url']+'?imageMogr2/auto-orient/thumbnail/750x/blur/1x0/quality/100',
+        placeholder: (context, url) => Container(
+          width: 130,
+          height: 250,
+          child: Center(child: SpinKitDoubleBounce(
+              color: Colors.white,
+              size: 20.0,
+              controller: AnimationController(
+                  vsync: this, duration: const Duration(milliseconds: 1200))),),
+        ),
+        width: 130,
+        height: 250,
+        fit: BoxFit.cover,
+      ),
+      borderRadius: BorderRadius.circular(8),
     );
   }
 }
