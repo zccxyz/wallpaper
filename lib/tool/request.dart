@@ -8,7 +8,10 @@ class Request {
     dio.options.baseUrl = 'http://video.heroitsme.com/apis/';
   }
 
-  Future<Response> get(String path, Map<String, dynamic> queryParameters) async {
+  Future<Response> get(String path, Map<String, dynamic> queryParameters, {int type = 1}) async {
+    if(type == 2) {
+      dio.options.baseUrl = 'https://claritywallpaper.com/clarity/api/';
+    }
     try{
       return dio.get(path, queryParameters: queryParameters);
     }on DioError catch (e){

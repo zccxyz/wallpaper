@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:us/app/wallpaper/look.dart';
 import 'package:us/tool/request.dart';
 import 'package:us/tool/tool.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -28,20 +30,36 @@ class _WallpaperState extends State<Wallpaper> with TickerProviderStateMixin {
     {'name': '主屏', 'id': 'ff8080816a87dbfa016a8b33bc32289f'},
     {'name': '免费', 'id': 'ff8080816e00e3c2016e1517ade34e31'},
   ];
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getData();
+    getData('update');
   }
 
-  void getData() async {
+  void getData(String type) async {
+    if (type == 'update') {
+      page = 1;
+    } else {
+      page++;
+    }
+    print(type);
     var rs = await Request().get('wallpaper/list', {'p': page});
     if (rs.data['Code'] == 0) {
+      if (page == 1) {
+        _refreshController.refreshCompleted();
+      } else {
+        _refreshController.loadComplete();
+      }
       setState(() {
-        for (var v in rs.data['Data']) {
-          data.add(v);
+        if (type == 'update') {
+          data = rs.data['Data'];
+        } else {
+          for (var v in rs.data['Data']) {
+            data.add(v);
+          }
         }
       });
     }
@@ -76,16 +94,19 @@ class _WallpaperState extends State<Wallpaper> with TickerProviderStateMixin {
                 title: Text("友视觉"),
                 backgroundColor: defColor,
                 bottom: PreferredSize(
-                    child: TabBar(
-                      indicatorColor: lightColor,
-                      unselectedLabelColor: defColor2,
-                      labelColor: lightColor,
-                      isScrollable: true,
-                      tabs: spec
-                          .map((v) => Tab(
-                                text: v['name'],
-                              ))
-                          .toList(),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 15, right: 15),
+                      child: TabBar(
+                        indicatorColor: lightColor,
+                        unselectedLabelColor: defColor2,
+                        labelColor: lightColor,
+                        isScrollable: true,
+                        tabs: spec
+                            .map((v) => Tab(
+                                  text: v['name'],
+                                ))
+                            .toList(),
+                      ),
                     ),
                     preferredSize: Size(getSize(context).width, 50)),
               ),
@@ -97,7 +118,15 @@ class _WallpaperState extends State<Wallpaper> with TickerProviderStateMixin {
   }
 
   Widget pageItem(v) {
-    return CupertinoScrollbar(
+    if(v['name'] != '所有专题') {
+      return Container();
+    }
+    return SmartRefresher(
+      enablePullDown: true,
+      enablePullUp: true,
+      onRefresh: () => getData('update'),
+      onLoading: () => getData('load'),
+      controller: _refreshController,
       child: ListView.builder(
         itemBuilder: (_, i) => item(i),
         itemCount: data.length,
@@ -114,33 +143,50 @@ class _WallpaperState extends State<Wallpaper> with TickerProviderStateMixin {
         children: <Widget>[
           Container(
             height: 50,
-            child: Text(data[i]['Headline']),
+            child: Text(
+              data[i]['Headline'],
+              style: TextStyle(color: lightColor),
+            ),
             alignment: Alignment.centerLeft,
           ),
           Container(
             height: 250,
             child: ListView.builder(
-              itemBuilder: (_, x) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: CachedNetworkImage(
-                  imageUrl: data[i]['List'][x]['Url'],
-                  placeholder: (context, url) => SpinKitDoubleBounce(
-                      color: Colors.white,
-                      size: 25.0,
-                      controller: AnimationController(
-                          vsync: this,
-                          duration: const Duration(milliseconds: 1200))),
-                  width: 130,
-                  height: 250,
-                  fit: BoxFit.cover,
+              itemBuilder: (_, x) => GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => Look(data[i]['List'][x]['Url'])));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Hero(
+                    child: cacheImg(i, x),
+                    tag: data[i]['List'][x]['Url'],
+                  ),
                 ),
               ),
-              itemCount: 10,
+              itemCount: data[i]['List'].length,
               scrollDirection: Axis.horizontal,
             ),
           )
         ],
       ),
+    );
+  }
+
+  Widget cacheImg(i, x) {
+    return CachedNetworkImage(
+      imageUrl: data[i]['List'][x]['Url'],
+      placeholder: (context, url) => SpinKitDoubleBounce(
+          color: Colors.white,
+          size: 20.0,
+          controller: AnimationController(
+              vsync: this, duration: const Duration(milliseconds: 1200))),
+      width: 130,
+      height: 250,
+      fit: BoxFit.cover,
     );
   }
 }

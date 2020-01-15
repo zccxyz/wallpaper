@@ -56,10 +56,12 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text("壁纸"),
           ),
           BottomNavigationBarItem(
+            backgroundColor: defColor2,
             icon: Icon(Icons.clear_all),
             title: Text("分类"),
           ),
           BottomNavigationBarItem(
+            backgroundColor: defColor2,
             icon: Icon(Icons.search),
             title: Text("搜索"),
           ),
