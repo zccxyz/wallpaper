@@ -5,13 +5,13 @@ class Request {
   Request() {
     dio = Dio();
     dio.options.connectTimeout = 15000;
-    dio.options.baseUrl = 'http://video.heroitsme.com/apis/';
+    dio.options.baseUrl = 'https://claritywallpaper.com/clarity/api/';
   }
 
-  Future<Response> get(String path, Map<String, dynamic> queryParameters, {int type = 1}) async {
-    if(type == 2) {
+  Future<Response> get(String path, {Map<String, dynamic> queryParameters, int type = 1}) async {
+    /*if(type == 2) {
       dio.options.baseUrl = 'https://claritywallpaper.com/clarity/api/';
-    }
+    }*/
     try{
       return dio.get(path, queryParameters: queryParameters);
     }on DioError catch (e){

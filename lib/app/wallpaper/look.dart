@@ -26,12 +26,12 @@ class _LookState extends State<Look> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: defColor,
-      body:Stack(
+      body: Stack(
         children: <Widget>[
           Hero(
             tag: widget.url,
             child: CachedNetworkImage(
-              imageUrl: widget.url,
+              imageUrl: widget.url+cs,
               placeholder: (context, url) => SpinKitDoubleBounce(
                   color: Colors.white,
                   size: 25.0,
@@ -64,16 +64,19 @@ class _LookState extends State<Look> with TickerProviderStateMixin {
                         }),
                   ),
                   Expanded(
-                    child: Builder(builder: (c)=>load?CupertinoActivityIndicator():IconButton(
-                        icon: Icon(
-                          CupertinoIcons.down_arrow,
-                          color: lightColor,
-                          size: 30,
-                        ),
-                        onPressed: () {
-                          download(c);
-                        }),)
-                  ),
+                      child: Builder(
+                    builder: (c) => load
+                        ? CupertinoActivityIndicator()
+                        : IconButton(
+                            icon: Icon(
+                              CupertinoIcons.down_arrow,
+                              color: lightColor,
+                              size: 30,
+                            ),
+                            onPressed: () {
+                              download(c);
+                            }),
+                  )),
                 ],
               ),
             ),
@@ -89,16 +92,15 @@ class _LookState extends State<Look> with TickerProviderStateMixin {
     });
     var response = await Dio()
         .get(widget.url, options: Options(responseType: ResponseType.bytes));
-    if(response.statusCode != 200) {
-      Scaffold.of(c).showSnackBar(SnackBar(content: Text('请求出错'+response.statusCode.toString())));
+    if (response.statusCode != 200) {
+      Scaffold.of(c).showSnackBar(
+          SnackBar(content: Text('请求出错' + response.statusCode.toString())));
     }
+    await ImagePickerSaver.saveFile(
+        fileData: Uint8List.fromList(response.data));
     Scaffold.of(c).showSnackBar(SnackBar(content: Text('下载成功')));
     setState(() {
       load = false;
     });
-    var filePath = await ImagePickerSaver.saveFile(
-        fileData: Uint8List.fromList(response.data));
-
-    File.fromUri(Uri.file(filePath));
   }
 }

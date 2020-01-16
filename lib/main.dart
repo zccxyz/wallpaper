@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Wallpaper(),
           Classify(),
-          Search(),
+//          Search(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -60,11 +60,11 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: Icon(Icons.clear_all),
             title: Text("分类"),
           ),
-          BottomNavigationBarItem(
+          /*BottomNavigationBarItem(
             backgroundColor: defColor2,
             icon: Icon(Icons.search),
             title: Text("搜索"),
-          ),
+          ),*/
         ],
         onTap: (i){
           setState(() {
